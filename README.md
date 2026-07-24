@@ -1,135 +1,70 @@
-# GlobeTrotter – Travel Assistant
+# GlobeTrotter Travel Assistant — Yaoundé Edition
 
-GlobeTrotter is a **monolithic Flask application** that serves as the starting point for a semester-long capstone project.  
-Students build the monolith first, then refactor it into microservices, and finally deploy it to the cloud with resilience patterns using Docker, Kubernetes, and cloud-native tooling.
+**Phase 1: Monolith** (target: end of Class 3)
 
----
-
-## Project Structure
+A travel recommendation assistant scoped to Yaoundé, Cameroon — search
+destinations, get personalized recommendations based on your interests,
+and plan/share itineraries. This phase pairs a FastAPI monolith with a
+Next.js web frontend.
 
 ```
-.
-├── app/
-│   ├── __init__.py         # Flask app factory
-│   ├── models.py           # Data models and JSON file I/O
-│   ├── auth.py             # Registration, login, JWT handling
-│   ├── destinations.py     # Destination search endpoint
-│   ├── recommendations.py  # Personalised recommendations endpoint
-│   ├── itineraries.py      # Create / list itineraries
-│   └── main.py             # App entry point
-├── data/
-│   ├── destinations.json   # Static destination catalogue (seed data)
-│   ├── users.json          # Created at runtime
-│   └── itineraries.json    # Created at runtime
-├── tests/                  # Placeholder for future tests
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
+globetrotter-yaounde-project/
+├── backend/     FastAPI + JSON file storage (see backend/README.md)
+└── frontend/    Next.js + TypeScript + Tailwind (see frontend/README.md)
 ```
 
----
+## Running the whole thing
 
-## REST API
+You need both halves running at once, in two terminals.
 
-| Method | Endpoint            | Auth required | Description                              |
-|--------|---------------------|---------------|------------------------------------------|
-| POST   | `/register`         | No            | Register a new user                      |
-| POST   | `/login`            | No            | Authenticate and receive a JWT token     |
-| GET    | `/destinations`     | No            | Search the destination catalogue         |
-| GET    | `/recommendations`  | Yes (JWT)     | Get personalised recommendations        |
-| POST   | `/itineraries`      | Yes (JWT)     | Create a new itinerary                   |
-| GET    | `/itineraries`      | Yes (JWT)     | List all itineraries for the logged-in user |
-
-Protected routes expect the header:  
-`Authorization: Bearer <your-token>`
-
-### Example requests
-
+**Terminal 1 — backend:**
 ```bash
-# Register
-curl -X POST http://localhost:5000/register \
-  -H "Content-Type: application/json" \
-  -d '{"username": "alice", "password": "s3cr3t", "preferences": ["beach", "food"]}'
-
-# Login
-curl -X POST http://localhost:5000/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "alice", "password": "s3cr3t"}'
-# Save the returned token: TOKEN=<value from .token field>
-
-# Search destinations
-curl "http://localhost:5000/destinations?tag=beach&max_cost=100"
-
-# Personalised recommendations
-curl http://localhost:5000/recommendations \
-  -H "Authorization: Bearer $TOKEN"
-
-# Create an itinerary
-curl -X POST http://localhost:5000/itineraries \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
-  -d '{"title": "Beach Escape", "destinations": ["Bali"], "start_date": "2025-07-01", "end_date": "2025-07-14"}'
-
-# List itineraries
-curl http://localhost:5000/itineraries \
-  -H "Authorization: Bearer $TOKEN"
-```
-
----
-
-## Running Locally
-
-### Prerequisites
-- Python 3.9+
-- pip
-
-```bash
-# 1. Install dependencies
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-# 2. Start the server
-python app/main.py
+uvicorn app.main:app --reload
 ```
+Runs at `http://localhost:8000`. Visit `http://localhost:8000/docs` for the
+interactive API explorer.
 
-The API will be available at `http://localhost:5000`.
-
----
-
-## Running with Docker
-
+**Terminal 2 — frontend:**
 ```bash
-# Build and start
-docker-compose up --build
-
-# Stop
-docker-compose down
+cd frontend
+npm install
+cp .env.local.example .env.local
+npm run dev
 ```
+Runs at `http://localhost:3000` — open this in your browser.
 
-The `data/` directory is mounted into the container, so JSON files persist between runs.
+## Trying it out
 
----
+1. Go to `http://localhost:3000` and click **Create an account**.
+2. Fill in name/email/password, continue, then pick at least 2 interests
+   from the grid (Museums, Restaurants, Sport & Outdoors, etc.).
+3. You'll land on the Home dashboard with recommendations already tailored
+   to what you picked.
+4. Open any destination, click **Add to itinerary**, create a new trip.
+5. Go to **My Trips** to see it, rename it, remove stops, or **Share** it
+   by email — try opening the itinerary's direct link in a private/
+   incognito window to see the public "shared trip" view.
 
-## Data Storage
+## What's real vs. simplified in Phase 1
 
-All data is persisted in plain JSON files inside the `data/` directory:
+**Real:** password hashing (bcrypt), signed JWT sessions, ownership checks
+on itinerary edits, a working rule-based recommendation engine, full
+search/filter, responsive design across phone/tablet/desktop.
 
-| File                    | Purpose                              |
-|-------------------------|--------------------------------------|
-| `data/destinations.json`| Static catalogue of travel destinations (seed data) |
-| `data/users.json`       | Registered users (created at runtime) |
-| `data/itineraries.json` | User itineraries (created at runtime) |
+**Simplified (intentionally, for Phase 1):** JSON files instead of a
+database, no token revocation, no automated test suite, a single deploy
+unit instead of independent services. Each of these gaps is the specific
+thing the next phase exists to address — see each folder's own README for
+the reasoning behind these choices.
 
-> **Note:** `data/*.json` (except `destinations.json`) are excluded from version control via `.gitignore`.
+## Next: Phase 2 (Microservices)
 
----
-
-## Configuration
-
-| Environment Variable | Default                              | Description           |
-|----------------------|--------------------------------------|-----------------------|
-| `SECRET_KEY`         | `globetrotter-secret-change-in-prod` | JWT signing key – **must be overridden in production** |
-| `FLASK_DEBUG`        | `0`                                  | Set to `1` to enable Flask debug mode (development only) |
-| `PORT`               | `5000`                               | Port the app listens on |
-
-> **Important:** Always set `SECRET_KEY` to a long, random value in production (e.g. `python -c "import secrets; print(secrets.token_hex(32))"`).
+Split the backend into independent services (Users/Auth, Destinations,
+Itineraries, Recommendations), each with its own database, talking over
+REST/gRPC behind an API gateway. The frontend's `lib/api.ts` is already
+written against clean REST boundaries, so it shouldn't need major changes
+— just pointed at different service URLs (or a gateway) once Phase 2 lands.
