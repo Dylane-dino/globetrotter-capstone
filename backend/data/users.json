@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cf4d7c4e-9d03-49e6-a94e-bfc8a2d5e664",
+    "name": "younga dilane",
+    "email": "younga.aime@ictuniversity.edu.cm",
+    "preferred_tags": [
+      "museum",
+      "art",
+      "history",
+      "culture",
+      "church",
+      "landmark",
+      "photography",
+      "accommodation",
+      "luxury",
+      "business",
+      "pool"
+    ],
+    "budget_level": "medium",
+    "password_hash": "$2b$12$OZwugGILcJzOLFyorj6JdOZcxQmk0lhT8bXnEZ4.2VOQXj7/qZKxW"
+  }
+]
