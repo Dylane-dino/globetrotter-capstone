@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-stamp: "Space Mono", ui-monospace, monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #6b8570 transparent;
+}
+
+/* Visible keyboard focus everywhere - accessibility floor, not optional */
+:focus-visible {
+  outline: 2px solid #e3a93f;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- The signature element: an ink-stamp badge, used only on the
+   auth pages as the one memorable visual risk in the design. ---- */
+.stamp-badge {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 148px;
+  height: 148px;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  font-family: var(--font-stamp);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transform: rotate(-8deg);
+}
+
+.stamp-badge::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 9999px;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+}
+
+.stamp-badge span {
+  position: relative;
+}
+
+/* Subtle grain so photographic heroes don't feel like flat stock imagery */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
