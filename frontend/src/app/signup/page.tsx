@@ -141,37 +141,39 @@ export default function SignupPage() {
     <AuthShell
       heroImage="/images/mont-febe.jpg"
       heroAlt="View of Mont Fébé overlooking Yaoundé"
+      eyebrow="Yaoundé, Cameroon"
+      headline="Start Your Journey"
       tagline="Tell us who you are, then show us what you love."
+      supporting="We'll tailor every recommendation to your taste from day one."
     >
-      <div className="md:hidden mb-8">
-        <Logo size="md" />
-      </div>
-
-      <h1 className="font-display text-3xl font-semibold text-canopy mb-1">
+      <h2 className="font-display text-2xl font-semibold text-ivory mb-1">
         Create your account
-      </h1>
-      <p className="text-ink/60 mb-8">Step 1 of 2 — the basics.</p>
+      </h2>
+      <p className="text-ivory/70 text-sm mb-6">Step 1 of 2 — the basics.</p>
 
       <form onSubmit={handleContinue} className="flex flex-col gap-4">
         <TextField
+          variant="glass"
           label="Full name"
           type="text"
           autoComplete="name"
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Ekema Njoya"
+          placeholder="Enter your full name"
         />
         <TextField
+          variant="glass"
           label="Email"
           type="email"
           autoComplete="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder="Enter your email"
         />
         <TextField
+          variant="glass"
           label="Password"
           type="password"
           autoComplete="new-password"
@@ -181,25 +183,26 @@ export default function SignupPage() {
           placeholder="At least 6 characters"
         />
         <TextField
+          variant="glass"
           label="Confirm password"
           type="password"
           autoComplete="new-password"
           required
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="••••••••"
+          placeholder="Re-enter your password"
         />
 
         <ErrorBanner message={error} />
 
-        <Button type="submit" fullWidth className="mt-2">
+        <Button type="submit" fullWidth className="mt-1">
           Continue
         </Button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-ink/60">
+      <p className="mt-6 text-center text-sm text-ivory/75">
         Already have an account?{" "}
-        <Link href="/" className="text-laterite font-semibold hover:underline">
+        <Link href="/" className="text-marigold font-semibold hover:underline">
           Sign in
         </Link>
       </p>

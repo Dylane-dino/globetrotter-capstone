@@ -19,12 +19,30 @@ Open `http://localhost:3000`.
 
 ## Design decisions
 
+**Branding.** The logo (`public/logo.png`, and a cropped icon-only mark at
+`src/app/icon.png` used as the favicon) is the project's real designed
+logo, with its background keyed out for transparency so it drops cleanly
+onto both light surfaces (navbar) and photo backgrounds (auth pages, with
+a subtle drop-shadow applied via the `onPhoto` prop on `<Logo />`).
+
+**Auth pages.** Login and signup (step 1) use a full-bleed photo with a
+frosted glass card floating on top - the same treatment on both pages for
+consistency. The onboarding interest grid (signup step 2) intentionally
+switches to a clean, non-photographic background instead: with 7 tiles
+each showing their own photo, adding a third busy photo behind them would
+hurt legibility rather than help it.
+
+One deliberate omission: the earlier design's "Forgot password?" and
+"Sign in with Google" affordances aren't backed by real functionality yet
+(no password-reset flow, no OAuth integration). "Forgot password?" is kept
+as a honest placeholder - clicking it shows an inline note rather than
+silently failing or pretending to work. The Google button was left out
+entirely rather than shipped as a non-functional decoration.
+
 **Visual identity.** Rather than a generic travel-app look, the palette and
 type are grounded in Yaoundé itself: a deep forest-canopy green, a warm
 laterite (red-earth) accent, and marigold gold, paired with Fraunces
-(display), Inter (body), and Space Mono (labels). The one deliberate visual
-flourish — an ink passport-stamp badge — appears only on the login/signup
-hero, so it stays memorable rather than overused.
+(display), Inter (body), and Space Mono (labels/eyebrows).
 
 **Cross-platform via responsive web, not native apps.** One Next.js
 codebase adapts to phone, tablet, and desktop through responsive layout,

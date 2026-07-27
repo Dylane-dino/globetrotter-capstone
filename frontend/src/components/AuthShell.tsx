@@ -4,50 +4,66 @@ import Logo from "./Logo";
 export default function AuthShell({
   heroImage,
   heroAlt,
+  eyebrow,
+  headline,
   tagline,
+  supporting,
   children,
 }: {
   heroImage: string;
   heroAlt: string;
+  eyebrow: string;
+  headline: string;
   tagline: string;
+  supporting: string;
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-ivory">
-      {/* Hero side */}
-      <div className="relative h-[38vh] md:h-auto md:w-1/2 overflow-hidden bg-canopy">
-        <Image
-          src={heroImage}
-          alt={heroAlt}
-          fill
-          priority
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 50vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-canopy-dark via-canopy/40 to-transparent" />
-        <div className="grain-overlay" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-canopy-dark">
+      {/* Full-bleed photo background */}
+      <Image
+        src={heroImage}
+        alt={heroAlt}
+        fill
+        priority
+        className="object-cover"
+        sizes="100vw"
+      />
+      {/* Uniform dark tint so both the headline and the glass card stay
+          legible regardless of how bright the underlying photo is */}
+      <div className="absolute inset-0 bg-canopy-dark/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-canopy-dark/80 via-canopy-dark/20 to-canopy-dark/40 md:bg-gradient-to-r md:from-canopy-dark/70 md:via-canopy-dark/25 md:to-canopy-dark/55" />
+      <div className="grain-overlay" />
 
-        <div className="absolute top-6 left-6 md:top-8 md:left-8">
-          <Logo variant="light" size="sm" />
-        </div>
-
-        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 flex items-end gap-4">
-          <div className="stamp-badge text-ivory">
-            <span className="text-[11px] leading-tight">Yaoundé</span>
-            <span className="text-[9px] leading-tight opacity-80">CMR</span>
-            <span className="text-[9px] leading-tight opacity-80 mt-1">
-              3.87°N 11.52°E
-            </span>
-          </div>
-          <p className="hidden md:block font-display text-ivory text-xl max-w-[220px] leading-snug pb-2">
-            {tagline}
-          </p>
-        </div>
+      {/* Logo, top-left */}
+      <div className="absolute top-6 left-6 md:top-8 md:left-10 z-10">
+        <Logo onPhoto size="sm" />
       </div>
 
-      {/* Form side */}
-      <div className="flex-1 flex items-center justify-center px-6 py-10 md:py-16">
-        <div className="w-full max-w-sm">{children}</div>
+      {/* Content */}
+      <div className="relative z-10 flex min-h-screen w-full flex-col md:flex-row md:items-center">
+        {/* Headline block */}
+        <div className="flex flex-col justify-end md:justify-center px-6 md:px-16 pt-28 pb-10 md:py-10 md:flex-1 md:max-w-xl">
+          <span className="font-stamp text-xs uppercase tracking-[0.2em] text-marigold mb-3">
+            {eyebrow}
+          </span>
+          <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.05] text-ivory drop-shadow-lg">
+            {headline}
+          </h1>
+          <p className="mt-5 text-lg sm:text-xl font-semibold text-ivory/95 max-w-md">
+            {tagline}
+          </p>
+          <p className="mt-3 text-sm sm:text-base text-ivory/75 max-w-sm leading-relaxed">
+            {supporting}
+          </p>
+        </div>
+
+        {/* Glass card */}
+        <div className="px-6 pb-10 md:pb-0 md:px-16 md:flex-shrink-0 md:w-[420px]">
+          <div className="w-full rounded-2xl border border-white/25 bg-white/15 backdrop-blur-2xl shadow-lifted p-6 sm:p-8">
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );

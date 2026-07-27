@@ -1,26 +1,27 @@
-import { Compass } from "lucide-react";
+import Image from "next/image";
 
 export default function Logo({
-  variant = "dark",
+  onPhoto = false,
   size = "md",
 }: {
-  variant?: "dark" | "light";
+  /** true when placed directly over a photo (adds a drop-shadow for legibility) */
+  onPhoto?: boolean;
   size?: "sm" | "md" | "lg";
 }) {
-  const textColor = variant === "light" ? "text-ivory" : "text-canopy";
-  const sizes = {
-    sm: "text-lg gap-1.5",
-    md: "text-2xl gap-2",
-    lg: "text-4xl gap-3",
-  };
-  const iconSizes = { sm: 18, md: 24, lg: 32 };
+  const heights = { sm: 28, md: 36, lg: 52 };
+  const height = heights[size];
+  // Source lockup is 624x253
+  const width = Math.round(height * (624 / 253));
 
   return (
-    <div className={`flex items-center ${sizes[size]} ${textColor}`}>
-      <Compass size={iconSizes[size]} strokeWidth={2} className="text-laterite shrink-0" />
-      <span className="font-display font-semibold tracking-tight">
-        GlobeTrotter
-      </span>
-    </div>
+    <Image
+      src="/logo.png"
+      alt="GlobeTrotter Travel Assistant"
+      width={width}
+      height={height}
+      priority
+      className={onPhoto ? "drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)]" : ""}
+      style={{ height: `${height}px`, width: "auto" }}
+    />
   );
 }

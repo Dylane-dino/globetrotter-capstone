@@ -7,7 +7,6 @@ import AuthShell from "@/components/AuthShell";
 import TextField from "@/components/TextField";
 import Button from "@/components/Button";
 import ErrorBanner from "@/components/ErrorBanner";
-import Logo from "@/components/Logo";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 
@@ -18,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForgotNote, setShowForgotNote] = useState(false);
 
   useEffect(() => {
     if (!sessionLoading && user) {
@@ -47,48 +47,66 @@ export default function LoginPage() {
     <AuthShell
       heroImage="/images/monument-reunification.jpg"
       heroAlt="The Monument de la Réunification in Yaoundé"
-      tagline="Fifteen places. One city. Wherever you start, we'll help you plan it."
+      eyebrow="Yaoundé, Cameroon"
+      headline="Explore Every Corner"
+      tagline="Fifteen places. One city. Endless ways to experience it."
+      supporting="Sign in to pick up your itinerary right where you left off."
     >
-      <div className="md:hidden mb-8">
-        <Logo size="md" />
-      </div>
-
-      <h1 className="font-display text-3xl font-semibold text-canopy mb-1">
+      <h2 className="font-display text-2xl font-semibold text-ivory mb-1">
         Welcome back
-      </h1>
-      <p className="text-ink/60 mb-8">Sign in to keep planning your trip.</p>
+      </h2>
+      <p className="text-ivory/70 text-sm mb-6">Sign in to your account.</p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <TextField
+          variant="glass"
           label="Email"
           type="email"
           autoComplete="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder="Enter your email"
         />
-        <TextField
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-        />
+        <div>
+          <TextField
+            variant="glass"
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+          />
+          <div className="flex justify-end mt-1.5">
+            <button
+              type="button"
+              onClick={() => setShowForgotNote((v) => !v)}
+              className="text-xs text-ivory/70 hover:text-ivory underline underline-offset-2"
+            >
+              Forgot password?
+            </button>
+          </div>
+          {showForgotNote && (
+            <p className="text-xs text-ivory/60 mt-1.5">
+              Password reset isn&apos;t available yet in this phase — for
+              now, sign up again with a new account if needed.
+            </p>
+          )}
+        </div>
 
         <ErrorBanner message={error} />
 
-        <Button type="submit" fullWidth isLoading={isSubmitting} className="mt-2">
-          Sign in
+        <Button type="submit" fullWidth isLoading={isSubmitting} className="mt-1">
+          Sign In
         </Button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-ink/60">
-        New to GlobeTrotter?{" "}
-        <Link href="/signup" className="text-laterite font-semibold hover:underline">
-          Create an account
+      <p className="mt-6 text-center text-sm text-ivory/75">
+        New here?{" "}
+        <Link href="/signup" className="text-marigold font-semibold hover:underline">
+          Create an Account
         </Link>
       </p>
     </AuthShell>
