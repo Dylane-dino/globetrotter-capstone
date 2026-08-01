@@ -59,6 +59,31 @@ Then open `http://127.0.0.1:8000/docs` for the interactive Swagger UI
 (FastAPI generates this automatically — use it to try every endpoint
 without writing a client).
 
+### Gemini configuration
+
+Set `GEMINI_API_KEY` in the root `.env` file (or in the backend process
+environment) before starting FastAPI. The `/chat` endpoint uses
+`gemini-2.5-flash`, retrieves from the local destination catalogue, and
+filters output against that catalogue before returning it. Never put this
+key in a frontend or `NEXT_PUBLIC_*` variable.
+
+## Testing
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests/ -v
+```
+
+30 tests covering auth (signup/login/tokens), destination search, the
+recommendation engine, and itinerary CRUD + ownership enforcement. Tests
+never touch the real `data/*.json` files — `tests/conftest.py` points the
+app at an isolated temp copy (via the `GLOBETROTTER_DATA_DIR` env var,
+see `app/storage.py`) before the app is even imported, so running the
+suite is always safe to do against your real seed data.
+
+This is also what both CI pipelines (`.github/workflows/ci.yml` and the
+root `Jenkinsfile`) run on every push.
+
 ## Endpoints
 
 | Method | Path                              | Auth required?            | Purpose                                   |
@@ -76,6 +101,10 @@ without writing a client).
 | DELETE | `/itineraries/{id}`                | Yes (must be owner)         | Delete an itinerary                        |
 | POST   | `/itineraries/{id}/share`          | Yes (must be owner)         | Share an itinerary by email                |
 | POST   | `/recommendations`                 | No                          | Get scored destination recommendations     |
+| GET    | `/community/posts`                 | No                          | List community posts                       |
+| POST   | `/community/posts`                 | Yes                         | Publish a community post                   |
+| POST   | `/community/posts/{id}/comments`   | Yes                         | Comment on a post                          |
+| POST   | `/chat`                            | No                          | Gemini RAG answer with FCFA estimates      |
 
 ## Authentication
 

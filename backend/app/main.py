@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+from pathlib import Path
 
-from app.routers import auth, destinations, itineraries, recommendations, users
+# Docker Compose provides environment variables itself. For local `uvicorn`
+# development, also load the repository-root .env file before routers import
+# modules that read configuration such as GEMINI_API_KEY.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
+from app.routers import auth, chat, community, destinations, itineraries, recommendations, users
 
 app = FastAPI(
     title="GlobeTrotter Travel Assistant - Yaoundé Edition",
@@ -34,6 +41,8 @@ app.include_router(destinations.router)
 app.include_router(users.router)
 app.include_router(itineraries.router)
 app.include_router(recommendations.router)
+app.include_router(community.router)
+app.include_router(chat.router)
 
 
 @app.get("/", tags=["health"])
