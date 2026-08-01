@@ -19,28 +19,31 @@ export default function SearchAndFilter({
   onQueryChange,
   category,
   onCategoryChange,
+  showSearchInput = true,
 }: {
   query: string;
   onQueryChange: (v: string) => void;
   category: string;
   onCategoryChange: (v: string) => void;
+  showSearchInput?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
-        <Search
-          size={18}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-canopy/40"
-        />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => onQueryChange(e.target.value)}
-          placeholder="Search destinations in Yaoundé..."
-          className="w-full rounded-full border border-canopy/15 bg-white pl-11 pr-4 py-3 text-ink placeholder:text-ink/35 focus:border-marigold focus:ring-1 focus:ring-marigold outline-none transition-colors"
-        />
-      </div>
-
+      {showSearchInput && (
+        <div className="relative">
+          <Search
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-canopy/40"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            placeholder="Search destinations in Yaoundé..."
+            className="w-full rounded-full border border-canopy/15 bg-white pl-11 pr-4 py-3 text-ink placeholder:text-ink/35 focus:border-marigold focus:ring-1 focus:ring-marigold outline-none transition-colors"
+          />
+        </div>
+      )}
       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         {CATEGORIES.map((c) => (
           <button
