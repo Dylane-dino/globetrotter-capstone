@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Navbar from "@/components/Navbar";
+import HomeHero from "@/components/HomeHero";
 import DestinationCard from "@/components/DestinationCard";
 import SearchAndFilter from "@/components/SearchAndFilter";
 import Spinner from "@/components/Spinner";
@@ -10,11 +11,16 @@ import { useAuth } from "@/context/AuthContext";
 import * as api from "@/lib/api";
 import type { Destination, RecommendedDestination } from "@/lib/types";
 
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+const NOT_PROMOTED_CATEGORIES = new Set(["hospital"]);
+
+function DestinationRow({ destinations }: { destinations: Destination[] }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+      {destinations.map((d) => (
+        <DestinationCard key={d.id} destination={d} />
+      ))}
+    </div>
+  );
 }
 
 function HomeContent() {
@@ -22,12 +28,16 @@ function HomeContent() {
   const [allDestinations, setAllDestinations] = useState<Destination[]>([]);
   const [recommended, setRecommended] = useState<RecommendedDestination[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
+  const exploreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+    setIsLoading(true);
+    setError(null);
 
     Promise.all([
       api.getDestinations(),
@@ -35,8 +45,19 @@ function HomeContent() {
     ])
       .then(([destinations, recs]) => {
         if (cancelled) return;
+        // Keep this defensive check next to the state assignment as well as
+        // in the API client. It makes the render contract explicit.
+        if (!Array.isArray(destinations) || !Array.isArray(recs)) {
+          throw new Error("The server returned invalid destination data.");
+        }
         setAllDestinations(destinations);
         setRecommended(recs);
+      })
+      .catch((requestError: unknown) => {
+        if (cancelled) return;
+        setAllDestinations([]);
+        setRecommended([]);
+        setError(requestError instanceof Error ? requestError.message : "Destinations could not be loaded.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -46,6 +67,13 @@ function HomeContent() {
       cancelled = true;
     };
   }, [user, token]);
+
+  const popular = useMemo(() => {
+    return [...allDestinations]
+      .filter((d) => !NOT_PROMOTED_CATEGORIES.has(d.category))
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 5);
+  }, [allDestinations]);
 
   const filtered = useMemo(() => {
     return allDestinations.filter((d) => {
@@ -58,24 +86,52 @@ function HomeContent() {
     });
   }, [allDestinations, query, category]);
 
+  function scrollToExplore() {
+    exploreRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   return (
     <div className="min-h-screen bg-ivory">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <h1 className="font-display text-3xl sm:text-4xl font-semibold text-canopy">
-          {getGreeting()}, {user?.name.split(" ")[0]}.
-        </h1>
-        <p className="text-ink/60 mt-1 mb-10">
-          Here&apos;s Yaoundé, picked for you.
-        </p>
+      <HomeHero
+        name={user?.name.split(" ")[0] || ""}
+        query={query}
+        onQueryChange={setQuery}
+        onSubmit={scrollToExplore}
+      />
 
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         {isLoading ? (
           <div className="py-20 flex justify-center">
             <Spinner label="Loading destinations" />
           </div>
         ) : (
           <>
+            {error && (
+              <div className="mb-8 rounded-card border border-laterite/20 bg-laterite/5 p-4 text-sm text-ink/75" role="alert">
+                {error} Please refresh or try again shortly.
+              </div>
+            )}
+            {popular.length > 0 && (
+              <section className="mb-14">
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-stamp text-[11px] uppercase tracking-wider text-canopy/60">
+                      Popular in Yaoundé
+                    </span>
+                  </div>
+                  <button
+                    onClick={scrollToExplore}
+                    className="text-sm font-semibold text-laterite hover:underline"
+                  >
+                    View all
+                  </button>
+                </div>
+                <DestinationRow destinations={popular} />
+              </section>
+            )}
+
             {recommended.length > 0 && (
               <section className="mb-14">
                 <div className="flex items-center gap-2 mb-5">
@@ -92,7 +148,7 @@ function HomeContent() {
               </section>
             )}
 
-            <section>
+            <section ref={exploreRef} className="scroll-mt-20">
               <div className="flex items-center gap-2 mb-5">
                 <span className="font-stamp text-[11px] uppercase tracking-wider text-canopy/60">
                   Explore all of Yaoundé
@@ -106,6 +162,7 @@ function HomeContent() {
                   onQueryChange={setQuery}
                   category={category}
                   onCategoryChange={setCategory}
+                  showSearchInput={false}
                 />
               </div>
 
