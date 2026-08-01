@@ -15,16 +15,23 @@ for Phase 1 and remove in later phases.
 """
 
 import json
+import os
 import threading
 from pathlib import Path
 from typing import Any
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+# Overridable via GLOBETROTTER_DATA_DIR so the test suite can point at an
+# isolated temp copy instead of ever touching the real seed data on disk.
+DATA_DIR = Path(
+    os.environ.get("GLOBETROTTER_DATA_DIR")
+    or (Path(__file__).resolve().parent.parent / "data")
+)
 
 _locks: dict[str, threading.Lock] = {
     "destinations": threading.Lock(),
     "users": threading.Lock(),
     "itineraries": threading.Lock(),
+    "community_posts": threading.Lock(),
 }
 
 
@@ -43,7 +50,7 @@ def read_all(name: str) -> list[dict[str, Any]]:
 
 def write_all(name: str, records: list[dict[str, Any]]) -> None:
     """Overwrite the full contents of a JSON store."""
-    lock = _locks[name]
+    lock = _locks.setdefault(name, threading.Lock())
     with lock:
         path = _path(name)
         with open(path, "w", encoding="utf-8") as f:
@@ -58,7 +65,7 @@ def find_by_id(name: str, record_id: str) -> dict[str, Any] | None:
 
 
 def append(name: str, record: dict[str, Any]) -> dict[str, Any]:
-    lock = _locks[name]
+    lock = _locks.setdefault(name, threading.Lock())
     with lock:
         records = read_all(name)
         records.append(record)
@@ -69,7 +76,7 @@ def append(name: str, record: dict[str, Any]) -> dict[str, Any]:
 
 
 def update_by_id(name: str, record_id: str, updates: dict[str, Any]) -> dict[str, Any] | None:
-    lock = _locks[name]
+    lock = _locks.setdefault(name, threading.Lock())
     with lock:
         records = read_all(name)
         for i, record in enumerate(records):
@@ -83,7 +90,7 @@ def update_by_id(name: str, record_id: str, updates: dict[str, Any]) -> dict[str
 
 
 def delete_by_id(name: str, record_id: str) -> bool:
-    lock = _locks[name]
+    lock = _locks.setdefault(name, threading.Lock())
     with lock:
         records = read_all(name)
         filtered = [r for r in records if r.get("id") != record_id]

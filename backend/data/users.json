@@ -1,6 +1,6 @@
 [
   {
-    "id": "01a8deb9-ffa9-4d65-8280-b4927abe89b9",
+    "id": "5d1f21ae-f65b-4fde-a917-308da262fbf4",
     "name": "Dilane Younga",
     "email": "dilaneyounga@gmail.com",
     "preferred_tags": [
@@ -13,6 +13,22 @@
       "photography"
     ],
     "budget_level": "medium",
-    "password_hash": "$2b$12$LWI.EtXMeXJrtGw2m.pnZuipPP7R7XuZ6bJx/XEgRrl22jLVeSxCu"
+    "password_hash": "$2b$12$MvdrPIMbTVlwIZjpgovDru8SJeR5TCg5PBrM0WNpJJN8GrsZKvVgW"
+  },
+  {
+    "id": "9321c005-1247-48f7-9441-1b41c9f3e77b",
+    "name": "Browser Check",
+    "email": "browser-check-83fb926e@example.com",
+    "preferred_tags": [],
+    "budget_level": "medium",
+    "password_hash": "$2b$12$YxKDyNlvi58THN0ZV5T3LOtR2cJSG7Xk4hZyyBE2LWe9QDRSe/INq"
+  },
+  {
+    "id": "560873a1-33c5-4d7d-bd28-17172c58b759",
+    "name": "Proxy Check",
+    "email": "proxy-check-ece1076c@example.com",
+    "preferred_tags": [],
+    "budget_level": "medium",
+    "password_hash": "$2b$12$/FcNQeOn/1y0M8Srlgf3euVsHs02.1lVY9LEP.cpPRZXsYcz5vWsC"
   }
 ]

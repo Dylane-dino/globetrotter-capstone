@@ -1,9 +1,14 @@
 [
   {
-    "id": "8d5b5c3c-d132-4ee0-994a-0a7a36fe5722",
-    "user_id": "01a8deb9-ffa9-4d65-8280-b4927abe89b9",
+    "id": "9428a9ee-a77a-43d4-aa25-7e7b416cf2da",
+    "user_id": "5d1f21ae-f65b-4fde-a917-308da262fbf4",
     "title": "Exploration",
-    "items": [],
+    "items": [
+      {
+        "destination_id": "dest-002",
+        "day": 1
+      }
+    ],
     "shared_with": []
   }
 ]
