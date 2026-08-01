@@ -1,34 +1,16 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv/
-ENV/
-*.egg
-*.egg-info/
-dist/
-build/
-.eggs/
-.pytest_cache/
-.mypy_cache/
-*.pyo
-
-# Environment variables
+# Backend
 .env
-.env.*
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/test-results/
+backend/.pytest_cache/
 
-# Docker
-.dockerignore
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
 
-# Data files (populated at runtime; keep only .gitkeep)
-data/*.json
-
-# IDE / editor
-.vscode/
-.idea/
-*.swp
-*.swo
+# OS / editor
+.DS_Store
+*.log

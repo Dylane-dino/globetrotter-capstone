@@ -17,6 +17,15 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+### Google Maps configuration
+
+Copy `.env.local.example` to `.env.local` and set
+`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to a Google Cloud browser key. Enable
+**Maps JavaScript API** and **Directions API**, enable billing, and restrict
+the key to your frontend HTTP referrers. Restart the dev server after editing
+this file. The Gemini API key is backend-only: set `GEMINI_API_KEY` in the
+root `.env`, never in this frontend file.
+
 ## Design decisions
 
 **Branding.** The logo (`public/logo.png`, and a cropped icon-only mark at
@@ -97,12 +106,14 @@ clear their advisories - see the `overrides` field in `package.json`.
 
 ## Known limitations (fair to flag for Phase 1)
 
-- No automated tests yet - Phase 1 was validated via a full production
-  build (`npm run build`, zero type errors) and manual/API-level testing.
-  A real headless-browser click-through wasn't possible in the environment
-  this was built in; it's worth doing a manual pass through signup → login
-  → recommendations → add-to-itinerary → share before treating this as
-  fully verified.
+- No frontend unit/component tests (e.g. Jest + React Testing Library) yet.
+  CI does run `next lint` and a full production build (which includes
+  TypeScript type-checking) on every push, and the backend has a real
+  pytest suite - but there's no automated coverage of frontend component
+  behavior itself. A real headless-browser click-through wasn't possible
+  in the environment this was built in either; it's worth doing a manual
+  pass through signup → login → recommendations → add-to-itinerary → share
+  before treating this as fully verified.
 - Session tokens live in `localStorage`, which is fine for a course project
   but not ideal against XSS in a production app (an httpOnly cookie would
   be the harder-to-implement, more secure choice).
