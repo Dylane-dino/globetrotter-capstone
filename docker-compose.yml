@@ -1,13 +1,42 @@
-version: "3.9"
-
 services:
-  globetrotter:
-    build: .
-    container_name: globetrotter_app
+  backend:
+    build:
+      context: ./backend
+    container_name: globetrotter-backend
     ports:
-      - "5000:5000"
-    # Mount local code so changes are reflected without rebuilding the image
-    volumes:
-      - .:/globetrotter
+      - "8000:8000"
     environment:
-      - PORT=5000
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-only-secret-change-me-in-production}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      # Bind-mount the JSON data files so signups/itineraries created while
+      # the container runs persist on your host machine, and survive
+      # `docker compose down` / rebuilds. Remove this if you want a fully
+      # ephemeral container instead.
+      - ./backend/data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Baked into the client bundle at build time. Because the browser
+        # (not the frontend container) calls this URL directly, use
+        # localhost here, not the "backend" service name.
+        NEXT_PUBLIC_API_URL: /api/backend
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
+    environment:
+      BACKEND_API_URL: http://backend:8000
+    container_name: globetrotter-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
