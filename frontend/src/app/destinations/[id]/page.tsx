@@ -12,6 +12,8 @@ import Button from "@/components/Button";
 import AddToItineraryModal from "@/components/AddToItineraryModal";
 import * as api from "@/lib/api";
 import type { Destination } from "@/lib/types";
+import DestinationMap from "@/components/DestinationMap";
+import TravelPlanner from "@/components/TravelPlanner";
 
 const CATEGORY_LABELS: Record<string, string> = {
   nature: "Nature",
@@ -121,6 +123,11 @@ function DestinationDetailContent() {
               {destination.description}
             </p>
 
+            <section className="mt-7 rounded-card bg-marigold/10 p-5">
+              <h2 className="font-display text-xl text-canopy mb-2">✨ What&apos;s Special About This Place</h2>
+              <p className="text-ink/75 leading-relaxed">{destination.tags.length ? `${destination.name} is especially loved for its ${destination.tags.map((tag) => tag.replace(/-/g, " ")).join(", ")} atmosphere—one of the local experiences that gives Yaoundé its character.` : "A distinctive Yaoundé stop with its own local character and memorable atmosphere."}</p>
+            </section>
+
             {destination.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-6">
                 {destination.tags.map((tag) => (
@@ -173,6 +180,8 @@ function DestinationDetailContent() {
             </div>
           </aside>
         </div>
+        <TravelPlanner destination={destination} />
+        <DestinationMap name={destination.name} latitude={destination.lat} longitude={destination.lng} />
       </main>
 
       {showModal && (
