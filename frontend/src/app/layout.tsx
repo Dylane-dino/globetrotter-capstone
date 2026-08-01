@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/context/AuthContext";
+import TripAiChat from "@/components/TripAiChat";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body bg-ivory text-ink antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>{children}<TripAiChat /></AuthProvider>
       </body>
     </html>
   );

@@ -38,6 +38,7 @@ export default function Navbar() {
 
         <nav className="hidden sm:flex items-center gap-6">
           {navLink("/home", "Home")}
+          {navLink("/community", "Community")}
           {navLink("/itineraries", "My Trips")}
         </nav>
 

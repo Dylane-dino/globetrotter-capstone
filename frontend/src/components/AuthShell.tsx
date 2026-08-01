@@ -43,7 +43,7 @@ export default function AuthShell({
       {/* Content */}
       <div className="relative z-10 flex min-h-screen w-full flex-col md:flex-row md:items-center">
         {/* Headline block */}
-        <div className="flex flex-col justify-end md:justify-center px-6 md:px-16 pt-28 pb-10 md:py-10 md:flex-1 md:max-w-xl">
+        <div className="order-2 flex flex-col justify-end px-6 pt-4 pb-10 md:order-1 md:justify-center md:px-16 md:py-10 md:flex-1 md:max-w-xl">
           <span className="font-stamp text-xs uppercase tracking-[0.2em] text-marigold mb-3">
             {eyebrow}
           </span>
@@ -59,7 +59,7 @@ export default function AuthShell({
         </div>
 
         {/* Glass card */}
-        <div className="px-6 pb-10 md:pb-0 md:px-16 md:flex-shrink-0 md:w-[420px]">
+        <div className="order-1 px-6 pt-24 pb-6 md:order-2 md:pt-0 md:pb-0 md:px-16 md:flex-shrink-0 md:w-[420px]">
           <div className="w-full rounded-2xl border border-white/25 bg-white/15 backdrop-blur-2xl shadow-lifted p-6 sm:p-8">
             {children}
           </div>
