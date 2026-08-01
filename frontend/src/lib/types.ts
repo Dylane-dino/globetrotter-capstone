@@ -47,3 +47,10 @@ export interface Itinerary {
 export interface ApiErrorBody {
   detail?: string;
 }
+
+export interface CommunityComment { id: string; user_name: string; timestamp: string; body: string; }
+export interface CommunityPost { id: string; user_name: string; timestamp: string; location_tag: string; title: string; body: string; comments: CommunityComment[]; }
+export interface TransportEstimate { mode: string; duration_minutes: number; estimated_cost_fcfa: number; notes: string; }
+export interface DestinationHighlight { id: string; name: string; latitude: number; longitude: number; special_highlight: string; best_time_to_visit: string; estimated_stay_duration: string; transport: TransportEstimate[]; }
+export interface ChatResponse { message: string; suggested_destinations: DestinationHighlight[]; }
+export interface ChatHistoryItem { role: "user" | "assistant"; message: string; }

@@ -5,9 +5,14 @@ import type {
   ItineraryItem,
   RecommendedDestination,
   User,
+  CommunityPost,
+  ChatResponse, ChatHistoryItem,
 } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Keep browser calls same-origin. The Next route handler forwards requests to
+// FastAPI, avoiding CORS and localhost-resolution issues in the browser.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api/backend";
+const REQUEST_TIMEOUT_MS = 15_000;
 
 export class ApiError extends Error {
   status: number;
@@ -31,7 +36,23 @@ async function request<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+      signal: options.signal || controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ApiError("The server took too long to respond. Please check that the backend is running and try again.", 504);
+    }
+    throw new ApiError("Could not connect to the server. Please check that the backend is running and try again.", 0);
+  } finally {
+    window.clearTimeout(timeout);
+  }
 
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
@@ -48,6 +69,23 @@ async function request<T>(
     return undefined as T;
   }
   return res.json() as Promise<T>;
+}
+
+/**
+ * The API generic is compile-time only. Validate collection endpoints at
+ * runtime so an error payload can never be stored in state and rendered with
+ * `.map()` as though it were an array.
+ */
+async function requestArray<T>(
+  path: string,
+  options: RequestInit = {},
+  token?: string | null
+): Promise<T[]> {
+  const data = await request<unknown>(path, options, token);
+  if (!Array.isArray(data)) {
+    throw new ApiError("The server returned an invalid list response.", 502);
+  }
+  return data as T[];
 }
 
 // ---- Auth ----
@@ -91,7 +129,7 @@ export function getDestinations(params?: {
   if (params?.category) search.set("category", params.category);
   if (params?.tag) search.set("tag", params.tag);
   const qs = search.toString();
-  return request<Destination[]>(`/destinations${qs ? `?${qs}` : ""}`);
+  return requestArray<Destination>(`/destinations${qs ? `?${qs}` : ""}`);
 }
 
 export function getDestination(id: string): Promise<Destination> {
@@ -106,7 +144,7 @@ export function getRecommendations(payload: {
   budget_level?: string;
   limit?: number;
 }): Promise<RecommendedDestination[]> {
-  return request<RecommendedDestination[]>("/recommendations", {
+  return requestArray<RecommendedDestination>("/recommendations", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -164,3 +202,8 @@ export function shareItinerary(
     token
   );
 }
+
+export function getCommunityPosts(): Promise<CommunityPost[]> { return request<CommunityPost[]>("/community/posts"); }
+export function createCommunityPost(payload: { title: string; body: string; location_tag: string }, token: string): Promise<CommunityPost> { return request<CommunityPost>("/community/posts", { method: "POST", body: JSON.stringify(payload) }, token); }
+export function addCommunityComment(postId: string, body: string, token: string): Promise<CommunityPost> { return request<CommunityPost>(`/community/posts/${postId}/comments`, { method: "POST", body: JSON.stringify({ body }) }, token); }
+export function chat(payload: { message: string; latitude?: number; longitude?: number; history?: ChatHistoryItem[] }, token: string): Promise<ChatResponse> { return request<ChatResponse>("/chat", { method: "POST", body: JSON.stringify(payload) }, token); }
